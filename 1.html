@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Information</title>
+    <link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css" />
+    <script type="text/javascript" src="DataTables/datatables.min.js"></script>
+</head>
+
+<body>
+    <button type="button" class="btn btn-default">默认按钮</button>
+    <input id="selectFile" type="file" name="dataFile" onchange="loadImageFile();" />
+    <table id="example" class="display" cellspacing="0" width="100%">
+
+    </table>
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+    <script>
+        var data;
+        var table;
+        var freader = new FileReader();
+        //var rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+        function loadImageFile() {
+            if (table) {
+                table.destroy();
+
+            }
+            console.log('a');
+            if (document.getElementById("selectFile").files.length === 0) { return; }
+            var oFile = document.getElementById("selectFile").files[0];
+            //if (!rFilter.test(oFile.type)) { alert("You must select a valid image file!"); return; }
+            // freader.readAsArrayBuffer(oFile);
+            // freader.readAsBinaryString(oFile);
+            // freader.readAsDataURL(oFile);
+            freader.readAsText(oFile);
+        }
+
+        freader.onload = function (eve) {
+            //console.log('done: ' + (new Date() - dt) / 1000);
+            //document.getElementById("uploadPreview").src = eve.target.result;
+            //console.log(eve.target.result);
+            data = JSON.parse(freader.result);
+
+            table = $('#example').DataTable({
+                // scrollY: 300,
+                //"order": [[3, "desc"]],
+                //"dom": '<"top"i>rt<"bottom"flp><"clear">',
+                data: data,
+                columns: [
+                    { title: "id", "data": "id" },
+                    { title: "name", "data": "name" },
+                    { title: "price", "data": "price" },
+                ],
+                select:false,
+            });
+
+            return;
+            var debug = { hello: "world" };
+            var blob = new Blob([JSON.stringify(debug, null, 2)],
+                { type: 'application/json' });
+            var a = document.createElement("a");
+            a.href = window.URL.createObjectURL(blob);
+            a.download = "sql";
+            a.onclick = function () {
+                setTimeout(function () {
+                    //window.URL.revokeObjectURL(a.href);
+                }, 1500);
+            };
+            a.click();
+        };
+
+    </script>
+</body>
+
+</html>
