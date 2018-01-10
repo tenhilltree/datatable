@@ -1,0 +1,295 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Information</title>
+    <link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="Editor-1.7.0/css/editor.dataTables.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+        }
+
+        tfoot input {
+            width: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+            min-width: 60px;
+        }
+    </style>
+    <script type="text/javascript" src="DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="Editor-1.7.0/js/dataTables.editor.js"></script>
+</head>
+
+<body style="padding:20px 30px 0 30px;">
+    <div class="input-group" style="padding-bottom:20px;">
+        <span class="input-group-btn">
+            <button class="btn btn-primary" type="button" onclick="selectFile();this.blur();">select a file</button>
+        </span>
+        <input type="text" id="filepath" disabled="disabled" class="form-control" placeholder="">
+    </div>
+    <input id="selectFile" type="file" name="dataFile" onchange="loadImageFile();" accept=".json" multiple="" style="display:none;"
+    />
+
+    <div id="hToggle">
+        Toggle column:
+        <a class="toggle-vis" data-column="1">品牌信息</a> -
+        <a class="toggle-vis" data-column="2">品牌</a> -
+        <a class="toggle-vis" data-column="3">姓名</a> -
+        <a class="toggle-vis" data-column="4">电话</a> -
+        <a class="toggle-vis" data-column="5">邮箱</a> -
+        <a class="toggle-vis" data-column="6">职位</a> -
+        <a class="toggle-vis" data-column="7">产品结构</a> -
+        <a class="toggle-vis" data-column="8">价格</a> -
+        <a class="toggle-vis" data-column="9">定位</a> -
+        <a class="toggle-vis" data-column="10">年龄段</a> -
+        <a class="toggle-vis" data-column="11">网址</a> -
+        <a class="toggle-vis" data-column="12">邮箱</a> -
+        <a class="toggle-vis" data-column="13">电话</a> -
+        <a class="toggle-vis" data-column="14">工厂</a> -
+        <a class="toggle-vis" data-column="15">成立年份</a> -
+        <a class="toggle-vis" data-column="16">公司名字</a> -
+        <a class="toggle-vis" data-column="17">总部</a> -
+        <a class="toggle-vis" data-column="18">适合商场</a> -
+        <a class="toggle-vis" data-column="19">最后联系时间</a> -
+        <a class="toggle-vis" data-column="20">批注</a>
+    </div>
+
+    <table id="example" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th rowspan="2"></th>
+                <th rowspan="2">品牌信息</th>
+                <th rowspan="2">品牌</th>
+                <th rowspan="1" colspan="4">联系人</th>
+                <th rowspan="2">产品结构</th>
+                <th rowspan="2">价格</th>
+                <th rowspan="2">定位</th>
+                <th rowspan="2">年龄段</th>
+                <th rowspan="1" colspan="3">官网</th>
+                <th rowspan="2">工厂</th>
+                <th rowspan="2">成立年份</th>
+                <th rowspan="2">公司名字</th>
+                <th rowspan="2">总部</th>
+                <th rowspan="2">适合商场</th>
+                <th rowspan="2">最后联系时间</th>
+                <th rowspan="2">批注</th>
+            </tr>
+            <tr>
+                <th>姓名</th>
+                <th>电话</th>
+                <th>邮箱</th>
+                <th>职位</th>
+                <th>网址</th>
+                <th>邮箱</th>
+                <th>电话</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+    <script>
+        var data;
+        var table;
+        var editor = new $.fn.dataTable.Editor({
+            table: "#example",
+            fields: [
+                { name: "序号", "label": "品牌信息" },
+                { name: "品牌信息", "label": "品牌信息" },
+                { name: "品牌", "label": "品牌" },
+                { name: "联系人", "label": "联系人" },
+                { name: "联系人电话", "label": "联系人电话" },
+                { name: "联系人邮箱", "label": "联系人邮箱" },
+                { name: "联系人职位", "label": "联系人职位" },
+                { name: "官网", "label": "官网" },
+                { name: "官网邮箱", "label": "官网邮箱" },
+                { name: "官网电话", "label": "官网电话" },
+                { name: "产品结构", "label": "产品结构" },
+                { name: "价格", "label": "价格" },
+                { name: "定位", "label": "定位" },
+                { name: "年龄段", "label": "年龄段" },
+                { name: "工厂", "label": "工厂" },
+                { name: "成立年份", "label": "成立年份" },
+                { name: "公司名字", "label": "公司名字" },
+                { name: "总部", "label": "总部" },
+                { name: "适合商场", "label": "适合商场" },
+                { name: "批注", "label": "批注" },
+                { name: "最后修改时间", "label": "最后修改时间" },],
+            idSrc: '官网电话',
+        });
+        var freader = new FileReader();
+
+        $('#example tfoot th').each(function (i) {
+            if (i == 0) return;
+            var title = $(this).text();
+            // $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            $(this).html('<input type="text" />');
+        });
+        //var rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+        function loadImageFile() {
+            if (document.getElementById("selectFile").files.length === 0) { return; }
+
+            if (table) {
+                table.destroy();
+
+            }
+            console.log('a');
+            var oFile = document.getElementById("selectFile").files[0];
+            //if (!rFilter.test(oFile.type)) { alert("You must select a valid image file!"); return; }
+            // freader.readAsArrayBuffer(oFile);
+            // freader.readAsBinaryString(oFile);
+            // freader.readAsDataURL(oFile);
+            freader.readAsText(oFile);
+            $("#filepath").val($("#selectFile").val());
+            $("#selectFile").val("");
+        }
+
+        freader.onload = function (eve) {
+            //console.log('done: ' + (new Date() - dt) / 1000);
+            //document.getElementById("uploadPreview").src = eve.target.result;
+            //console.log(eve.target.result);
+            data = JSON.parse(freader.result);
+
+            table = $('#example').DataTable({
+                //scrollY: 300,
+                //"order": [[3, "desc"]],
+                //"dom": '<"top"i>rt<"bottom"flp><"clear">',
+                "scrollX": true,
+                data: data,
+                columns: [
+                    { title: "序号", "data": "品牌信息" },
+                    { title: "品牌信息", "data": "品牌信息" },
+                    { title: "品牌", "data": "品牌" },
+                    { title: "姓名", "data": "联系人" },
+                    { title: "电话", "data": "联系人电话" },
+                    { title: "邮箱", "data": "联系人邮箱" },
+                    { title: "职位", "data": "联系人职位" },
+                    { title: "产品结构", "data": "产品结构" },
+                    { title: "价格", "data": "价格" },
+                    { title: "定位", "data": "定位" },
+                    { title: "年龄段", "data": "年龄段" },
+                    { title: "网址", "data": "官网" },
+                    { title: "邮箱", "data": "官网邮箱" },
+                    { title: "电话", "data": "官网电话" },
+                    { title: "工厂", "data": "工厂" },
+                    { title: "成立年份", "data": "成立年份" },
+                    { title: "公司名字", "data": "公司名字" },
+                    { title: "总部", "data": "总部" },
+                    { title: "适合商场", "data": "适合商场" },
+                    { title: "最后修改时间", "data": "最后修改时间" },
+                    { title: "批注", "data": "批注" },
+                ],
+                "columnDefs": [
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "targets": 0
+                    },
+                    {
+                        "targets": [1, 2, 3, 4, 5, 6, 7],
+                        "visible": true,
+                        "searchable": true,
+                    }
+                ],
+                "order": [[1, 'asc']],
+                "autoWidth": false,
+                // autoFill: true,
+                select: true,
+                buttons: [
+                    { extend: 'create', editor: editor },
+                    { extend: 'edit', editor: editor },
+                    { extend: 'remove', editor: editor }
+                ],
+                dom: '<B><"row"<"col-sm-6"l><"col-sm-6"f>>rtip',
+                // responsive: true,
+                rowReorder: true,
+                stateSave: false,
+                "pagingType": "full_numbers",
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                
+
+            });
+
+            table.columns().every(function () {
+                var that = this;
+
+                $('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            table.on('order.dt search.dt', function () {
+                table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            $('a.toggle-vis').on('click', function (e) {
+                e.preventDefault();
+
+                // Get the column API object
+                var column = table.column($(this).attr('data-column'));
+
+                // Toggle the visibility
+                column.visible(!column.visible());
+            });
+
+            return;
+            var debug = { hello: "world" };
+            var blob = new Blob([JSON.stringify(debug, null, 2)],
+                { type: 'application/json' });
+            var a = document.createElement("a");
+            a.href = window.URL.createObjectURL(blob);
+            a.download = "sql";
+            a.onclick = function () {
+                setTimeout(function () {
+                    //window.URL.revokeObjectURL(a.href);
+                }, 1500);
+            };
+            a.click();
+        };
+
+        function selectFile() {
+            $("#selectFile").click();
+        }
+
+    </script>
+</body>
+
+</html>
