@@ -9,8 +9,16 @@
     <link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="Editor-1.7.0/css/editor.dataTables.css">
     <style>
-        th{
+        th,
+        td {
             text-align: center;
+        }
+
+        tfoot input {
+            width: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+            min-width: 60px;
         }
     </style>
     <script type="text/javascript" src="DataTables/datatables.min.js"></script>
@@ -27,7 +35,7 @@
     <input id="selectFile" type="file" name="dataFile" onchange="loadImageFile();" accept=".json" multiple="" style="display:none;"
     />
 
-    <div>
+    <div id="hToggle">
         Toggle column:
         <a class="toggle-vis" data-column="1">品牌信息</a> -
         <a class="toggle-vis" data-column="2">品牌</a> -
@@ -47,10 +55,11 @@
         <a class="toggle-vis" data-column="16">公司名字</a> -
         <a class="toggle-vis" data-column="17">总部</a> -
         <a class="toggle-vis" data-column="18">适合商场</a> -
-        <a class="toggle-vis" data-column="19">批注</a>   
+        <a class="toggle-vis" data-column="19">最后联系时间</a> -
+        <a class="toggle-vis" data-column="20">批注</a>
     </div>
 
-    <table id="example" class="table table-striped table-hover" cellspacing="0" width="100%">
+    <table id="example" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
         <thead>
             <tr>
                 <th rowspan="2"></th>
@@ -67,6 +76,7 @@
                 <th rowspan="2">公司名字</th>
                 <th rowspan="2">总部</th>
                 <th rowspan="2">适合商场</th>
+                <th rowspan="2">最后联系时间</th>
                 <th rowspan="2">批注</th>
             </tr>
             <tr>
@@ -79,6 +89,31 @@
                 <th>电话</th>
             </tr>
         </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
     </table>
     <script>
         $(document).ready(function () {
@@ -110,10 +145,18 @@
                 { name: "公司名字", "label": "公司名字" },
                 { name: "总部", "label": "总部" },
                 { name: "适合商场", "label": "适合商场" },
-                { name: "批注", "label": "批注" },],
+                { name: "批注", "label": "批注" },
+                { name: "最后修改时间", "label": "最后修改时间" },],
             idSrc: '官网电话',
         });
         var freader = new FileReader();
+
+        $('#example tfoot th').each(function (i) {
+            if (i == 0) return;
+            var title = $(this).text();
+            // $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            $(this).html('<input type="text" />');
+        });
         //var rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
         function loadImageFile() {
             if (document.getElementById("selectFile").files.length === 0) { return; }
@@ -140,7 +183,7 @@
             data = JSON.parse(freader.result);
 
             table = $('#example').DataTable({
-                scrollY: 300,
+                //scrollY: 300,
                 //"order": [[3, "desc"]],
                 //"dom": '<"top"i>rt<"bottom"flp><"clear">',
                 "scrollX": true,
@@ -165,6 +208,7 @@
                     { title: "公司名字", "data": "公司名字" },
                     { title: "总部", "data": "总部" },
                     { title: "适合商场", "data": "适合商场" },
+                    { title: "最后修改时间", "data": "最后修改时间" },
                     { title: "批注", "data": "批注" },
                 ],
                 "columnDefs": [
@@ -176,8 +220,7 @@
                     {
                         "targets": [1, 2, 3, 4, 5, 6, 7],
                         "visible": true,
-                        "searchable": false,
-                        "min-width": "100px",
+                        "searchable": true,
                     }
                 ],
                 "order": [[1, 'asc']],
@@ -189,11 +232,26 @@
                     { extend: 'edit', editor: editor },
                     { extend: 'remove', editor: editor }
                 ],
-                dom: 'Bfrtip',
+                dom: '<B><"row"<"col-sm-6"l><"col-sm-6"f>>rtip',
                 // responsive: true,
                 rowReorder: true,
+                stateSave: false,
+                "pagingType": "full_numbers",
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 
 
+            });
+
+            table.columns().every(function () {
+                var that = this;
+
+                $('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
             });
 
             table.on('order.dt search.dt', function () {
