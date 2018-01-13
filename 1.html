@@ -23,6 +23,8 @@
     </style>
     <script type="text/javascript" src="DataTables/datatables.min.js"></script>
     <script type="text/javascript" src="Editor-1.7.0/js/dataTables.editor.js"></script>
+    <!-- <script type="text/javascript" src="js/index.js"></script> -->
+    <script type="text/javascript" src="js/crypto-js.js"></script>
 </head>
 
 <body style="padding:20px 30px 0 30px;">
@@ -31,11 +33,18 @@
             <button class="btn btn-primary" type="button" onclick="selectFile();this.blur();">select a file</button>
         </span>
         <input type="text" id="filepath" disabled="disabled" class="form-control" placeholder="">
+        <span class="input-group-btn" style="width:150px;">
+            <input type="password" id="pas" class="form-control" placeholder="password">
+        </span>
+        <span class="input-group-btn">
+            <button class="btn btn-primary" type="button" onclick="openFile();this.blur();">open</button>
+            <button class="btn btn-primary" type="button" onclick="saveFile();this.blur();">save</button>
+        </span>
     </div>
     <input id="selectFile" type="file" name="dataFile" onchange="loadImageFile();" accept=".json" multiple="" style="display:none;"
     />
 
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" style="margin-bottom:10px;">
         <li class="active">
             <a href="#example1" data-toggle="tab">Home</a>
         </li>
@@ -46,30 +55,6 @@
 
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade in active" id="example1">
-            <div id="hToggle">
-                Toggle column:
-                <a class="toggle-vis" data-column="1">品牌信息</a> -
-                <a class="toggle-vis" data-column="2">品牌</a> -
-                <a class="toggle-vis" data-column="3">姓名</a> -
-                <a class="toggle-vis" data-column="4">电话</a> -
-                <a class="toggle-vis" data-column="5">邮箱</a> -
-                <a class="toggle-vis" data-column="6">职位</a> -
-                <a class="toggle-vis" data-column="7">产品结构</a> -
-                <a class="toggle-vis" data-column="8">价格</a> -
-                <a class="toggle-vis" data-column="9">定位</a> -
-                <a class="toggle-vis" data-column="10">年龄段</a> -
-                <a class="toggle-vis" data-column="11">网址</a> -
-                <a class="toggle-vis" data-column="12">邮箱</a> -
-                <a class="toggle-vis" data-column="13">电话</a> -
-                <a class="toggle-vis" data-column="14">工厂</a> -
-                <a class="toggle-vis" data-column="15">成立年份</a> -
-                <a class="toggle-vis" data-column="16">公司名字</a> -
-                <a class="toggle-vis" data-column="17">总部</a> -
-                <a class="toggle-vis" data-column="18">适合商场</a> -
-                <a class="toggle-vis" data-column="19">最后联系时间</a> -
-                <a class="toggle-vis" data-column="20">批注</a>
-            </div>
-
             <table id="example" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
                 <thead>
                     <tr>
@@ -174,30 +159,35 @@
             idSrc: '官网电话',
         });
         var freader = new FileReader();
-
+        
         $('#example tfoot th').each(function (i) {
             if (i == 0) return;
             var title = $(this).text();
             // $(this).html('<input type="text" placeholder="Search ' + title + '" />');
             $(this).html('<input type="text" />');
         });
+
+        function selectFile() {
+            $("#selectFile").click();
+        }
+
         //var rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
         function loadImageFile() {
-            if (document.getElementById("selectFile").files.length === 0) { return; }
-
+            $("#filepath").val($("#selectFile").val());
+            // if (document.getElementById("selectFile").files.length === 0) { return; }
+        }
+        
+        function openFile(){
+            var oFile = document.getElementById("selectFile").files[0];
+            if(!oFile) return;
             if (table) {
                 table.destroy();
-
             }
-            console.log('a');
-            var oFile = document.getElementById("selectFile").files[0];
             //if (!rFilter.test(oFile.type)) { alert("You must select a valid image file!"); return; }
             // freader.readAsArrayBuffer(oFile);
             // freader.readAsBinaryString(oFile);
             // freader.readAsDataURL(oFile);
             freader.readAsText(oFile);
-            $("#filepath").val($("#selectFile").val());
-            $("#selectFile").val("");
         }
 
         freader.onload = function (eve) {
@@ -254,7 +244,8 @@
                 buttons: [
                     { extend: 'create', editor: editor },
                     { extend: 'edit', editor: editor },
-                    { extend: 'remove', editor: editor }
+                    { extend: 'remove', editor: editor },
+                    'colvis'
                 ],
                 dom: '<B><"row"<"col-sm-6"l><"col-sm-6"f>>rtip',
                 // responsive: true,
@@ -288,16 +279,6 @@
                 });
             }).draw();
 
-            $('a.toggle-vis').on('click', function (e) {
-                e.preventDefault();
-
-                // Get the column API object
-                var column = table.column($(this).attr('data-column'));
-
-                // Toggle the visibility
-                column.visible(!column.visible());
-            });
-
             return;
             var debug = { hello: "world" };
             var blob = new Blob([JSON.stringify(debug, null, 2)],
@@ -313,8 +294,64 @@
             a.click();
         };
 
-        function selectFile() {
-            $("#selectFile").click();
+
+        // 会打开一个空白页下载，然后空白页消失，用户体验不好
+        function download1() {
+            var debug = { hello: "world" };
+            var blob = new Blob([JSON.stringify(debug, null, 2)],
+                { type: 'application/json' });
+            window.open(window.URL.createObjectURL(blob));
+        }
+
+        // 直接下载，用户体验好
+        function download2() {
+            var debug = { hello: "world" };
+            var blob = new Blob([JSON.stringify(debug, null, 2)],
+                { type: 'application/json' });
+            var $form = $('<form method="GET"></form>');
+            $form.attr('action', window.URL.createObjectURL(blob));
+            $form.appendTo($('body'));
+            $form.submit();
+        }
+
+        
+
+        //aes加密
+        function encrypt(word) {
+            var key = CryptoJS.enc.Utf8.parse("1234567890000000"); //16位
+            var iv = CryptoJS.enc.Utf8.parse("1234567890000000");
+            var encrypted = '';
+            if (typeof (word) == 'string') {
+                var srcs = CryptoJS.enc.Utf8.parse(word);
+                encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+            } else if (typeof (word) == 'object') {//对象格式的转成json字符串
+                data = JSON.stringify(word);
+                var srcs = CryptoJS.enc.Utf8.parse(data);
+                encrypted = CryptoJS.AES.encrypt(srcs, key, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                })
+            }
+            return encrypted.ciphertext.toString();
+        }
+        // aes解密
+        function decrypt(word) {
+            var key = CryptoJS.enc.Utf8.parse("1234567890000000");
+            var iv = CryptoJS.enc.Utf8.parse("1234567890000000");
+            var encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+            var srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
+            var decrypt = CryptoJS.AES.decrypt(srcs, key, {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+            return decryptedStr.toString();
         }
 
     </script>
