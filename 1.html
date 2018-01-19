@@ -129,6 +129,37 @@
 
         </div>
         <div class="tab-pane fade" id="example2">
+            <table id="tabletwo" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>会议信息</th>
+                        <th>Skype会议</th>
+                        <th>日期</th>
+                        <th>时间(外商当地时间)</th>
+                        <th>与中国的时差</th>
+                        <th>Skype ID</th>
+                        <th>最新联系时间 外方</th>
+                        <th>最新联系时间 我方</th>
+                        <th>联系情况概要</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <!-- <th></th> -->
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 
@@ -141,7 +172,7 @@
     </script>
     <script>
         var data;
-        var table;
+        var table, tabletwo;
         var editor = new $.fn.dataTable.Editor({
             table: "#example",
             fields: [
@@ -167,6 +198,24 @@
                 { name: "适合商场", "label": "适合商场" },
                 { name: "最后联系时间", "label": "最后联系时间", },
                 { name: "批注", "label": "批注", "type": "textarea" },
+            ],
+            // idSrc: '官网电话',
+        });
+
+        var editortwo = new $.fn.dataTable.Editor({
+            table: "#tabletwo",
+            fields: [
+                // { name: "序号", "label": "序号" },
+                // { name: "id","type":"hidden","default":"0" },
+                { name: "会议信息", "label": "会议信息" },
+                { name: "Skype会议", "label": "Skype会议" },
+                { name: "日期", "label": "日期" },
+                { name: "时间(外商当地时间)", "label": "时间(外商当地时间)" },
+                { name: "与中国的时差", "label": "与中国的时差" },
+                { name: "SkypeID", "label": "Skype ID" },
+                { name: "最新联系时间外方", "label": "最新联系时间 外方" },
+                { name: "最新联系时间我方", "label": "最新联系时间 我方" },
+                { name: "联系情况概要", "label": "联系情况概要", "type": "textarea" },
             ],
             // idSrc: '官网电话',
         });
@@ -232,9 +281,65 @@
             // "info": false,                        
             "tabIndex": -1,
         }
+
+        var initialOptionsTwo = {
+            "scrollX": true,
+            data: [],
+            columns: [
+                { title: "序号", "data": "会议信息" },
+                // { title: "id", "data": "id" },
+                { title: "会议信息", "data": "会议信息" },
+                { title: "Skype会议", "data": "Skype会议" },
+                { title: "日期", "data": "日期" },
+                { title: "时间(外商当地时间)", "data": "时间(外商当地时间)" },
+                { title: "与中国的时差", "data": "与中国的时差" },
+                { title: "Skype ID", "data": "SkypeID" },
+                { title: "最新联系时间 外方", "data": "最新联系时间外方" },
+                { title: "最新联系时间 我方", "data": "最新联系时间我方" },
+                { title: "联系情况概要", "data": "联系情况概要" }
+            ],
+            "columnDefs": [
+                {
+                    "searchable": false,
+                    "orderable": false,
+                    "targets": []
+                },
+                {
+                    "targets": [],
+                    "visible": false,
+                    "searchable": false,
+                }
+            ],
+            // // "order": [[1, 'asc']],
+            "autoWidth": true,
+            // autoFill: true,
+            select: true,
+            buttons: [
+                { extend: 'create', editor: editortwo },
+                { extend: 'edit', editor: editortwo },
+                { extend: 'remove', editor: editortwo },
+                'colvis'
+            ],
+            dom: '<B><"row"<"col-sm-6"l><"col-sm-6"f>>rtip',
+            // responsive: true,
+            rowReorder: false,
+            stateSave: false,
+            "pagingType": "full_numbers",
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            "deferRender": false,
+            // "info": false,                        
+            "tabIndex": -1,
+        }
         var freader = new FileReader();
 
         $('#example tfoot th').each(function (i) {
+            if (i == 0) return;
+            var title = $(this).text();
+            // $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            $(this).html('<input type="text" />');
+        });
+
+        $('#tabletwo tfoot th').each(function (i) {
             if (i == 0) return;
             var title = $(this).text();
             // $(this).html('<input type="text" placeholder="Search ' + title + '" />');
@@ -281,20 +386,22 @@
                 return;
             }
 
-            if (table.data().length > 0) {
+            if (table.data().length > 0 || tabletwo.data().length > 0) {
                 if (!confirm("Current unsaved table data will be lost, sure to continue?")) {
                     return;
                 }
             }
             table.clear();
-            table.rows.add(data).draw();
+            tabletwo.clear();
+            table.rows.add(data.table1).draw();
+            tabletwo.rows.add(data.table2).draw();
 
 
         };
 
 
         function saveFile() {
-            if (table.data().length <= 0) {
+            if (table.data().length <= 0 && tabletwo.data().length <= 0) {
                 alert("No data to save");
                 return;
             }
@@ -304,12 +411,17 @@
             }
 
             var data1 = table.rows().data();
-            var result = [];
+            var data2 = tabletwo.rows().data();
+            var result = { table1: [], table2: [] };
             for (var i = 0; i < data1.length; i++) {
-                result.push(data1[i]);
+                result.table1.push(data1[i]);
                 // for(var j=0;j<100;j++){
 
                 // }
+            }
+
+            for (var j = 0; j < data2.length; j++) {
+                result.table2.push(data2[j]);
             }
 
             result = JSON.stringify(result);
@@ -331,6 +443,7 @@
 
         function initTable(data) {
             table = $('#example').DataTable(initialOptions);
+            tabletwo = $('#tabletwo').DataTable(initialOptionsTwo);
 
             table.columns().every(function () {
                 var that = this;
@@ -345,6 +458,25 @@
             });
 
             table.on('order.dt search.dt', function () {
+                table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+
+            tabletwo.columns().every(function () {
+                var that = this;
+
+                $('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            tabletwo.on('order.dt search.dt', function () {
                 table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
                     cell.innerHTML = i + 1;
                 });
